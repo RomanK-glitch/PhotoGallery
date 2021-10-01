@@ -7,15 +7,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,14 +27,53 @@ class PhotoGalleryFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         retainInstance = true
+        setHasOptionsMenu(true)
         photoGalleryViewModel = ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
 
-        val responseHandler = Handler()
+        val responseHandler = Handler(Looper.getMainLooper())
         thumbnailDownloader = ThumbnailDownloader(responseHandler) {photoHolder, bitmap ->
             val drawable = BitmapDrawable(resources, bitmap)
             photoHolder.bindDrawable(drawable)
         }
         lifecycle.addObserver(thumbnailDownloader.fragmentLifecycleObserver)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_photo_gallery, menu)
+
+        val searchItem: MenuItem = menu.findItem(R.id.menu_item_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.apply {
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    Log.d(TAG, "QueryTextSubmit: $query")
+                    photoGalleryViewModel.fetchPhotos(query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    Log.d(TAG, "QueryTextChange: $query")
+                    return false
+                }
+            })
+
+            setOnSearchClickListener {
+                searchView.setQuery(photoGalleryViewModel.searchTerm, false)
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_item_clear -> {
+                photoGalleryViewModel.fetchPhotos("")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -56,11 +91,10 @@ class PhotoGalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         photoGalleryViewModel.galleryItemLiveData.observe(
-            viewLifecycleOwner,
-            Observer { galleryItems ->
-                photoRecyclerView.adapter = PhotoAdapter(galleryItems)
-            }
-        )
+            viewLifecycleOwner
+        ) { galleryItems ->
+            photoRecyclerView.adapter = PhotoAdapter(galleryItems)
+        }
     }
 
     override fun onDestroyView() {
