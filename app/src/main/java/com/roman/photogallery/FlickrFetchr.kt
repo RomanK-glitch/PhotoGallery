@@ -2,7 +2,6 @@ package com.roman.photogallery
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.BitmapFactory.decodeStream
 import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData

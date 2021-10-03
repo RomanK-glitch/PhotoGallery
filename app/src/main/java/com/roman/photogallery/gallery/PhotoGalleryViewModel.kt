@@ -1,7 +1,10 @@
-package com.roman.photogallery
+package com.roman.photogallery.gallery
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.roman.photogallery.FlickrFetchr
+import com.roman.photogallery.GalleryItem
+import com.roman.photogallery.QueryPreferences
 
 class PhotoGalleryViewModel(private val app: Application) : AndroidViewModel(app) {
 

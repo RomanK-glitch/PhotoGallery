@@ -1,4 +1,4 @@
-package com.roman.photogallery
+package com.roman.photogallery.gallery
 
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -9,19 +9,22 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
+import com.roman.photogallery.*
+import com.roman.photogallery.R
+import com.roman.photogallery.photoPage.PhotoPageActivity
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "PhotoGalleryFragment"
 private const val POLL_WORK = "POLL_WORK"
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : VisibleFragment() {
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
     private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoHolder>
@@ -87,7 +90,7 @@ class PhotoGalleryFragment : Fragment() {
             R.id.menu_item_toggle_polling -> {
                 val isPolling = QueryPreferences.isPolling(requireContext())
                 if (isPolling) {
-                    WorkManager.getInstance().cancelUniqueWork(POLL_WORK)
+                    WorkManager.getInstance(requireContext()).cancelUniqueWork(POLL_WORK)
                     QueryPreferences.setPolling(requireContext(), false)
                 } else {
                     val constraints = Constraints.Builder()
@@ -141,8 +144,29 @@ class PhotoGalleryFragment : Fragment() {
         lifecycle.removeObserver(thumbnailDownloader.fragmentLifecycleObserver)
     }
 
-    private class PhotoHolder(itemImageView: ImageView) : RecyclerView.ViewHolder(itemImageView) {
+    private inner class PhotoHolder(itemImageView: ImageView) : RecyclerView.ViewHolder(itemImageView), View.OnClickListener,
+        View.OnLongClickListener {
+        private lateinit var galleryItem: GalleryItem
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
+
+        fun bindGalleryItem(item: GalleryItem) {
+            galleryItem = item
+        }
+
+        override fun onClick(v: View?) {
+            val intent = PhotoPageActivity.newIntent(requireContext(), galleryItem.photoPageUri)
+            startActivity(intent)
+        }
+
+        override fun onLongClick(v: View?): Boolean {
+            Toast.makeText(context, "Download image", Toast.LENGTH_LONG).show()
+            return true
+        }
     }
 
     private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>) : RecyclerView.Adapter<PhotoHolder>() {
@@ -153,6 +177,7 @@ class PhotoGalleryFragment : Fragment() {
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
+            holder.bindGalleryItem(galleryItem)
             val placeholder: Drawable = ContextCompat.getDrawable(requireContext(), R.drawable.placeholder) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url)

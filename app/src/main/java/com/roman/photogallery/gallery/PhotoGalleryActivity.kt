@@ -1,9 +1,10 @@
-package com.roman.photogallery
+package com.roman.photogallery.gallery
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.roman.photogallery.R
 
 class PhotoGalleryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
