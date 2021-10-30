@@ -9,8 +9,12 @@ import com.roman.photogallery.R
 const val NOTIFICATION_CHANNEL_ID = "flickr_poll"
 
 class PhotoGalleryApplication: Application() {
+
+    lateinit var appComponent: AppComponent
+
     override fun onCreate() {
         super.onCreate()
+        appComponent = DaggerAppComponent.create()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_name)
             val importance = NotificationManager.IMPORTANCE_DEFAULT

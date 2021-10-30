@@ -47,7 +47,7 @@ class ThumbnailDownloader<in T>(private val responseHandler: Handler,
     private var hasQuit = false
     private lateinit var requestHandler: Handler
     private val requestMap = ConcurrentHashMap<T, String>()
-    private val flickrFetchr = FlickrFetchr()
+    private val flickrFetchr = DaggerAppComponent.create().flickrFetchr
 
     @Suppress("UNCHECKED_CAST")
     @SuppressLint("HandlerLeak")

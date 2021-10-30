@@ -15,17 +15,18 @@ private const val TAG = "PollWorker"
 
 class PollWorker(val context: Context, workerParameters: WorkerParameters)
     : Worker(context, workerParameters) {
+    val flickrFetchr = DaggerAppComponent.create().flickrFetchr
     override fun doWork(): Result {
         val query = QueryPreferences.getStoredQuery(context)
         val lastResultId = QueryPreferences.getLastResultId(context)
         val items: List<GalleryItem> = if (query.isEmpty()) {
-            FlickrFetchr().fetchPhotosRequest()
+            flickrFetchr.fetchPhotosRequest()
                 .execute()
                 .body()
                 ?.photos
                 ?.galleryItems
         } else {
-            FlickrFetchr().searchPhotosRequest(query)
+            flickrFetchr.searchPhotosRequest(query)
                 .execute()
                 .body()
                 ?.photos
