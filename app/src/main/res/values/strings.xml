@@ -12,4 +12,5 @@
     <string name="image_downloading">Image downloading...</string>
     <string name="download_notification_channel_name">DownloadImage</string>
     <string name="image_downloaded">Image downloaded</string>
+    <string name="merge_test">Merge test</string>
 </resources>
