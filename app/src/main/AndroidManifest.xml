@@ -32,6 +32,7 @@
                     android:name="com.roman.photogallery.SHOW_NOTIFICATION"/>
             </intent-filter>
         </receiver>
+        <service android:name=".gallery.DownloadService"/>
     </application>
 
 </manifest>

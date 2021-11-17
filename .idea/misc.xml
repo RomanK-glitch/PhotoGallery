@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/mrkos/AndroidStudioProjects/PhotoGallery/app/src/main/res/layout/list_item_gallery.xml" value="0.2536231884057971" />
+        <entry key="..\:/Users/mrkos/AndroidStudioProjects/PhotoGallery/app/src/main/res/menu/fragment_photo_page.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/mrkos/AndroidStudioProjects/PhotoGallery/app/src/main/res/menu/photo_page_item.xml" value="0.25416666666666665" />
+      </map>
+    </option>
+  </component>
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>

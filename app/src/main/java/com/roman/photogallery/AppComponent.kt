@@ -14,6 +14,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [AppModule::class])
 interface AppComponent {
+    fun inject(photoGalleryViewModel: PhotoGalleryViewModel)
 
     val flickrFetchr: FlickrFetchr
 }

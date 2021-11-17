@@ -8,4 +8,8 @@
     <string name="start_polling">Start polling</string>
     <string name="stop_polling">Stop polling</string>
     <string name="close">Close</string>
+    <string name="download_image">Download image</string>
+    <string name="image_downloading">Image downloading...</string>
+    <string name="download_notification_channel_name">DownloadImage</string>
+    <string name="image_downloaded">Image downloaded</string>
 </resources>

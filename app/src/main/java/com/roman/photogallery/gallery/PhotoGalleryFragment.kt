@@ -1,5 +1,6 @@
 package com.roman.photogallery.gallery
 
+import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -144,12 +145,33 @@ class PhotoGalleryFragment : VisibleFragment() {
         lifecycle.removeObserver(thumbnailDownloader.fragmentLifecycleObserver)
     }
 
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_item_download -> {
+                Toast.makeText(requireContext(), "Downloading image...", Toast.LENGTH_LONG).show()
+                val adapter = photoRecyclerView.adapter as PhotoAdapter
+                val currentGalleryItem = adapter.getGalleryItem()
+                Log.d(TAG, "Downloaded gallery item id: ${currentGalleryItem?.id}, url: ${currentGalleryItem?.url}")
+                Intent(requireContext(), DownloadService::class.java).also {
+                    intent ->
+                    intent.putExtra("title", currentGalleryItem?.title)
+                    intent.putExtra("url", currentGalleryItem?.url)
+                    requireContext().startService(intent)
+
+                }
+                return true
+            }
+            else -> super.onContextItemSelected(item)
+        }
+    }
+
     private inner class PhotoHolder(itemImageView: ImageView) : RecyclerView.ViewHolder(itemImageView), View.OnClickListener,
-        View.OnLongClickListener {
+    View.OnCreateContextMenuListener {
         private lateinit var galleryItem: GalleryItem
 
         init {
             itemView.setOnClickListener(this)
+            itemView.setOnCreateContextMenuListener(this)
         }
 
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
@@ -163,13 +185,26 @@ class PhotoGalleryFragment : VisibleFragment() {
             startActivity(intent)
         }
 
-        override fun onLongClick(v: View?): Boolean {
-            Toast.makeText(context, "Download image", Toast.LENGTH_LONG).show()
-            return true
+        override fun onCreateContextMenu(
+            menu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            menu?.add(Menu.NONE, R.id.menu_item_download, Menu.NONE, R.string.download_image)
         }
     }
 
     private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>) : RecyclerView.Adapter<PhotoHolder>() {
+        private var currentGalleryItem: GalleryItem? = null
+
+        fun getGalleryItem() : GalleryItem? {
+            return currentGalleryItem
+        }
+
+        fun setGalleryItem(currentGalleryItem: GalleryItem) {
+            this.currentGalleryItem = currentGalleryItem
+        }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoHolder {
             val view = layoutInflater.inflate(R.layout.list_item_gallery, parent, false) as ImageView
             return PhotoHolder(view)
@@ -180,11 +215,14 @@ class PhotoGalleryFragment : VisibleFragment() {
             holder.bindGalleryItem(galleryItem)
             val placeholder: Drawable = ContextCompat.getDrawable(requireContext(), R.drawable.placeholder) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
+            holder.itemView.setOnLongClickListener {
+                setGalleryItem(galleryItem)
+                false
+            }
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url)
         }
 
         override fun getItemCount(): Int = galleryItems.size
-
     }
 
     companion object {
