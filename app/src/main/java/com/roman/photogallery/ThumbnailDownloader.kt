@@ -9,6 +9,9 @@ import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.java.KoinJavaComponent.get
 import java.util.concurrent.ConcurrentHashMap
 
 private const val TAG = "ThumbnailDownloader"
@@ -16,7 +19,7 @@ private const val MESSAGE_DOWNLOAD = 0
 
 class ThumbnailDownloader<in T>(private val responseHandler: Handler,
                                 private val onThumbnailDownloaded: (T, Bitmap) -> Unit)
-    : HandlerThread(TAG) {
+    : HandlerThread(TAG), KoinComponent {
 
     val fragmentLifecycleObserver: LifecycleObserver =
         object : LifecycleObserver {
@@ -47,7 +50,12 @@ class ThumbnailDownloader<in T>(private val responseHandler: Handler,
     private var hasQuit = false
     private lateinit var requestHandler: Handler
     private val requestMap = ConcurrentHashMap<T, String>()
-    private val flickrFetchr = DaggerAppComponent.create().flickrFetchr
+
+    //by dagger
+    //private val flickrFetchr = DaggerAppComponent.create().flickrFetchr
+
+    //by koin
+    private val flickrFetchr = get<FlickrFetchr>()
 
     @Suppress("UNCHECKED_CAST")
     @SuppressLint("HandlerLeak")

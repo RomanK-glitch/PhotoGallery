@@ -5,6 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import com.roman.photogallery.R
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+
 
 const val NOTIFICATION_CHANNEL_ID = "flickr_poll"
 
@@ -14,6 +17,12 @@ class PhotoGalleryApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        startKoin {
+            androidContext(this@PhotoGalleryApplication)
+            modules(appModule)
+        }
+
         appComponent = DaggerAppComponent.create()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_name)

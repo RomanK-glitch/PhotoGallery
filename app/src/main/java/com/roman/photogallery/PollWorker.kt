@@ -10,12 +10,22 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.roman.photogallery.NOTIFICATION_CHANNEL_ID
 import com.roman.photogallery.gallery.PhotoGalleryActivity
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.java.KoinJavaComponent.get
+
 
 private const val TAG = "PollWorker"
 
 class PollWorker(val context: Context, workerParameters: WorkerParameters)
-    : Worker(context, workerParameters) {
-    val flickrFetchr = DaggerAppComponent.create().flickrFetchr
+    : Worker(context, workerParameters), KoinComponent {
+
+    //by dagger
+    //val flickrFetchr = DaggerAppComponent.create().flickrFetchr
+
+    //by koin
+    val flickrFetchr = get<FlickrFetchr>()
+
     override fun doWork(): Result {
         val query = QueryPreferences.getStoredQuery(context)
         val lastResultId = QueryPreferences.getLastResultId(context)
